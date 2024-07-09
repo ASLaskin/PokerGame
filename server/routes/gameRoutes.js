@@ -1,9 +1,10 @@
 const express = require('express');
-//const { createGame, joinRandomGame } = require('../controllers/gameController');
+const { createGame,joinGame} = require('../controllers/gameController');
 
 const router = express.Router();
 
-//router.post('/create', createGame);
+router.post('/game/create', createGame);
+router.post('/game/join', joinGame);
 
 
 

@@ -1,30 +1,20 @@
 const PokerGame = require('./pokerGame');
+const Player = require('./player');
 
 class GameManager {
-  constructor() {
-    this.games = {};
-  }
-
-  createGame(gameId, players) {
-    if (!this.games[gameId]) {
-      this.games[gameId] = new PokerGame(gameId, players);
+    constructor(gameState) {
+        this.gameID = gameState.gameID;
+        this.players = gameState.players.map(player => new Player(player.name));
+        this.pokerGame = new PokerGame(this.players);
     }
-    return this.games[gameId];
-  }
 
-  getGame(gameId) {
-    return this.games[gameId];
-  }
-
-  deleteGame(gameId) {
-    delete this.games[gameId];
-  }
-
-  updateGameState(gameId, gameState) {
-    if (this.games[gameId]) {
-      this.games[gameId].updateState(gameState);
+    getGameState() {
+        return {
+            gameID: this.gameID,
+            players: this.players.map(player => player.getName()),
+            gameStatus: this.pokerGame.getStatus()
+        };
     }
-  }
 }
 
-module.exports = new GameManager();
+module.exports = GameManager;

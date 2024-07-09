@@ -1,20 +1,10 @@
 const mongoose = require('mongoose');
 
 const gameStateSchema = new mongoose.Schema({
-    //this will be either waiting, inProgress, or complete
-    gameStatus: {
-        type: String,
-        required: true
-    },
-    gameID: {
-        type: String,
-        required: true
-    },
-    //dont know if we need but could be used to keep track of amount of players
-    players: {
-        type: Array,
-        required: true
-    },
+    gameID: { type: String, required: true, unique: true },
+    players: { type: Number, required: true },
+    gameStatus: { type: String, required: true, default: 'waiting' },
+    createdAt: { type: Date, default: Date.now }
 });
 
 const GameState = mongoose.model('GameState', gameStateSchema);

@@ -1,19 +1,37 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
     const [name, setName] = useState('');
+    const [gameID, setGameID] = useState('');
+    const navigate = useNavigate();
 
     const handleNameChange = (e) => {
         setName(e.target.value);
     };
 
-    const handleCreateGame = () => {
-        console.log(`Creating game with name: ${name}`);
+    const handleGameIDChange = (e) => {
+        setGameID(e.target.value);
     };
 
-    const handleJoinGame = () => {
-        const gameId = document.getElementById('gameCodeInput').value;
-        console.log(`Joining game ${gameId} with name: ${name}`);
+    const handleCreateGame = async () => {
+        try {
+            const response = await axios.post('/api/game/create', { name });
+            const createdGameID = response.data.gameID;
+            navigate.push(`/game/${createdGameID}`);
+        } catch (error) {
+            console.error('Error creating game:', error);
+        }
+    };
+
+    const handleJoinGame = async () => {
+        try {
+            await axios.post('/api/game/join', { gameID, player: { name } });
+            navigate.push(`/game/${gameID}`);
+        } catch (error) {
+            console.error('Error joining game:', error);
+        }
     };
 
     return (
@@ -22,49 +40,37 @@ const Home = () => {
                 <div className="flex justify-center">
                     <h1 className="text-3xl mb-6">PokerUp</h1>
                 </div>
-                <div className="flex justify-center mb-8">
+                <div className="flex justify-center">
                     <input
                         type="text"
                         value={name}
                         onChange={handleNameChange}
-                        className="border rounded-lg px-4 py-2 focus:outline-none focus:border-green-500 w-60"
-                        placeholder="Enter Your Name"
+                        className="border rounded-lg px-4 py-2 mb-4"
+                        placeholder="Enter your name"
                     />
                 </div>
-                <div className="flex justify-center mb-4">
+                <div className="flex justify-center">
                     <button
                         onClick={handleCreateGame}
-                        className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg mr-4"
+                        className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg"
                     >
-                        Create New Game
-                    </button>
-                    <button
-                        onClick={handleJoinGame}
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg"
-                    >
-                        Join Game
+                        Create Game
                     </button>
                 </div>
-                <div className="flex justify-center">
-                    <div className="mr-4">
-                        <div className="flex justify-center">
-                            <h2 className="text-xl mb-4">Join Specific Game</h2>
-                        </div>
-                        <div className="flex mb-4">
-                            <input
-                                id="gameCodeInput"
-                                type="text"
-                                className="border rounded-l-lg px-4 py-2 focus:outline-none focus:border-blue-500 w-40"
-                                placeholder="Game ID"
-                            />
-                            <button
-                                onClick={handleJoinGame}
-                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-r-lg"
-                            >
-                                Join
-                            </button>
-                        </div>
-                    </div>
+                <div className="flex justify-center mt-4">
+                    <input
+                        type="text"
+                        value={gameID}
+                        onChange={handleGameIDChange}
+                        className="border rounded-l-lg px-4 py-2 focus:outline-none focus:border-blue-500 w-40"
+                        placeholder="Game ID"
+                    />
+                    <button
+                        onClick={handleJoinGame}
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-r-lg"
+                    >
+                        Join
+                    </button>
                 </div>
             </div>
         </div>

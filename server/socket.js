@@ -1,25 +1,34 @@
 const GameState = require('./models/gameState');
+const GameManager = require('./logic/gameManager');
 
-function handleSocket(io) {
+const handleSocket = (io) => {
     io.on('connection', (socket) => {
-        console.log('A user connected');
-        socket.on('disconnect', () => {
-            console.log('A user disconnected');
+        console.log('New client connected:', socket.id);
+
+        socket.on('joinGame', async ({ gameID, playerName }) => {
+            const gameState = await GameState.findOne({ gameID });
+
+            if (gameState) {
+                socket.join(gameID);
+                socket.gameID = gameID;
+                socket.playerName = playerName;
+
+                console.log(`Socket ${socket.id} joined game ${gameID} as ${playerName}`);
+
+                // socket.to(gameID).emit('playerJoined', { playerName });
+            } else {
+                socket.emit('error', { message: 'Game not found' });
+            }
         });
-        // socket.on('createGame', (data) => {
-        //     console.log('createGame', data);
-        //     const gameState = new GameState({
-        //         game: 'waiting',
-        //         players: [data.player]
-        //     });
-        //     gameState.save().then(() => {
-        //         console.log('Game state saved');
-        //         socket.emit('gameCreated', gameState);
-        //     }).catch(err => {
-        //         console.log(err);
-        //     });
-        // });
+
+        socket.on('disconnect', () => {
+            console.log('Client disconnected:', socket.id);
+            if (socket.gameID) {
+             
+                // socket.to(socket.gameID).emit('playerLeft', { playerName: socket.playerName });
+            }
+        });
     });
-}
+};
 
 module.exports = { handleSocket };

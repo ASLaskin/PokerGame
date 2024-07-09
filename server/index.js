@@ -13,7 +13,6 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-console.log(process.env.MONGODB_URI);
 mongoose.connect(process.env.MONGODB_URI, {
 }).then(() => console.log('MongoDB connected')).catch(err => console.log(err));
 
@@ -23,16 +22,18 @@ const store = MongoStore.create({
 });
 
 app.use(session({
+  name: 'pokerup.sid',
   secret: process.env.SESSION_SECRET,
   resave: false,
-  saveUninitialized: false,
+  saveUninitialized: true,
   store: store,
   cookie: { maxAge: 1000 * 60 * 60 * 24 }
 }));
+
 app.use(express.json());
 app.use('/api', gameRoutes);
 
-//handleSocket(io);
+handleSocket(io);
 
 const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => console.log(`Server is active on ${PORT}`));
