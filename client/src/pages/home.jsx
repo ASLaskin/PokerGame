@@ -17,9 +17,10 @@ const Home = () => {
 
     const handleCreateGame = async () => {
         try {
-            const response = await axios.post('/api/game/create', { name });
+            //this needs to be change to the server's URL
+            const response = await axios.post('http://localhost:3000/api/game/create', { name });
             const createdGameID = response.data.gameID;
-            navigate.push(`/game/${createdGameID}`);
+            navigate(`/game/${createdGameID}`);
         } catch (error) {
             console.error('Error creating game:', error);
         }
@@ -27,8 +28,8 @@ const Home = () => {
 
     const handleJoinGame = async () => {
         try {
-            await axios.post('/api/game/join', { gameID, player: { name } });
-            navigate.push(`/game/${gameID}`);
+            await axios.post('http://localhost:3000/api/game/join', { gameID, player: { name } });
+            navigate(`/game/${gameID}`);
         } catch (error) {
             console.error('Error joining game:', error);
         }

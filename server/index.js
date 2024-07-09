@@ -6,6 +6,7 @@ const MongoStore = require('connect-mongo');
 const socketIo = require('socket.io');
 const gameRoutes = require('./routes/gameRoutes');
 const { handleSocket } = require('./socket');
+const cors = require('cors');
 
 require('dotenv').config();
 
@@ -20,6 +21,13 @@ const store = MongoStore.create({
   mongoUrl: process.env.MONGODB_URI,
   collection: 'sessions'
 });
+
+const corsOptions = {
+  origin: 'http://localhost:5173', // Replace with your front-end URL in production
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type'],
+};
+app.use(cors(corsOptions));
 
 app.use(session({
   name: 'pokerup.sid',
