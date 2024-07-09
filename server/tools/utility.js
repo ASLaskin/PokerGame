@@ -1,7 +1,3 @@
-module.exports = {
-    makeid,
-}
-
 function makeid(length) {
     var result           = '';
     var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -11,3 +7,5 @@ function makeid(length) {
     }
     return result;
  }
+
+ module.exports = makeid;

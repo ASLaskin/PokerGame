@@ -1,8 +1,7 @@
 const GameState = require('../models/gameState');
-const makeid = require('../utils/utility');
+const makeid = require('../tools/utility');
 
 const createGame = async (req, res) => {
-    name = req.body.name;
     const players = 1;
     const gameID = makeid(6);
     const gameState = new GameState({
@@ -14,7 +13,7 @@ const createGame = async (req, res) => {
     try {
         await gameState.save();
         req.session.gameID = gameID;
-        req.session.playerName = name;
+        req.session.playerName = req.body.name;
         req.session.save();
         res.status(201).json(gameState);
     } catch (error) {
