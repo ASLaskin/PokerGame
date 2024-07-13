@@ -21,20 +21,18 @@ const createGame = async (req, res) => {
     }
 }
 const joinGame = async (req, res) => {
-    const { gameID, player } = req.body;
+    const { gameID } = req.body;
 
     try {
         const gameState = await GameState.findOne({ gameID });
-
         if (!gameState) {
             return res.status(404).json({ message: 'Game not found' });
         }
-
-        gameState.players.push(player);
+        gameState.players += 1;
+        console.log("here")
         await gameState.save();
 
         req.session.gameID = gameID; 
-        req.session.playerName = name;
         req.session.save(); 
 
         res.status(200).json(gameState);

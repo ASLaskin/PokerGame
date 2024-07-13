@@ -5,27 +5,56 @@ const handleSocket = (io) => {
     io.on('connection', (socket) => {
         console.log('New client connected:', socket.id);
 
-        socket.on('joinGame', async ({ gameID, playerName }) => {
-            const gameState = await GameState.findOne({ gameID });
+        socket.on('joinGame', async (gameID) => {
+            try {
+                const gameState = await GameState.findOne({ gameID });
 
-            if (gameState) {
-                socket.join(gameID);
-                socket.gameID = gameID;
-                socket.playerName = playerName;
+                if (gameState) {
+                    if (gameState.players.length < 2) {
+                        socket.join(gameID);
+                        socket.gameID = gameID;
+                        socket.counter = 0; 
 
-                console.log(`Socket ${socket.id} joined game ${gameID} as ${playerName}`);
+                        console.log(`Socket ${socket.id} joined game ${gameID}`);
 
-                // socket.to(gameID).emit('playerJoined', { playerName });
-            } else {
-                socket.emit('error', { message: 'Game not found' });
+                        socket.emit('counterUpdated', socket.counter);
+                    } else {
+                        socket.emit('error', { message: 'Game is full' });
+                    }
+                } else {
+                    socket.emit('error', { message: 'Game not found' });
+                }
+            } catch (error) {
+                console.error('Error joining game:', error);
+                socket.emit('error', { message: 'Internal server error' });
             }
         });
 
-        socket.on('disconnect', () => {
+        socket.on('incrementCounter', () => {
+            console.log('Incrementing counter:', socket.counter); // Add logging here
+            socket.counter += 1;
+            console.log('New counter value:', socket.counter); // Add logging here
+            io.to(socket.gameID).emit('counterUpdated', socket.counter);
+        });
+
+        socket.on('disconnect', async () => {
             console.log('Client disconnected:', socket.id);
             if (socket.gameID) {
-             
-                // socket.to(socket.gameID).emit('playerLeft', { playerName: socket.playerName });
+                try {
+                    const gameState = await GameState.findOne({ gameID: socket.gameID });
+                    if (gameState) {
+                        gameState.players -= 1;
+                        //change to properly handle player disconnect
+                        await gameState.save();
+
+                        //delete game if no players are left
+                        if (gameState.players.length === 0) {
+                            await GameState.deleteOne({ gameID: socket.gameID });
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error on disconnect:', error);
+                }
             }
         });
     });

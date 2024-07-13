@@ -12,7 +12,14 @@ require('dotenv').config();
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = socketIo(server, {
+  cors: {
+    origin: 'http://localhost:5173', // Replace with your front-end URL in production
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type'],
+    credentials: true,
+  }
+});
 
 mongoose.connect(process.env.MONGODB_URI, {
 }).then(() => console.log('MongoDB connected')).catch(err => console.log(err));
@@ -26,6 +33,7 @@ const corsOptions = {
   origin: 'http://localhost:5173', // Replace with your front-end URL in production
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type'],
+  credentials: true,
 };
 app.use(cors(corsOptions));
 
@@ -42,6 +50,7 @@ app.use(express.json());
 app.use('/api', gameRoutes);
 
 handleSocket(io);
+
 
 const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => console.log(`Server is active on ${PORT}`));
