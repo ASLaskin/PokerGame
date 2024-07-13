@@ -1,21 +1,37 @@
 const GameState = require('./models/gameState');
+const pokerGame = require('./logic/pokerGame');
+
+const games = {};
 
 const handleSocket = (io) => {
     io.on('connection', (socket) => {
         console.log('New client connected:', socket.id);
 
-        socket.on('joinGame', async (gameID) => {
+        socket.on('joinGame', async (gameID, name) => {
             console.log('trying to join game:', gameID); 
             try {
                 const gameState = await GameState.findOne({ gameID });
 
                 if (gameState) {
                     console.log('Game found:');
-                    console.log('game has players:', gameState.players);
                     if (gameState.players < 2) {
                         socket.join(gameID);
+
+                        if (!games[gameID]) {
+                            games[gameID] = new pokerGame(gameID);
+                        }
+                        games[gameID].addPlayer(name);
+
+                        console.log('player added to game:', games[gameID].getPlayers());
+
+                        gameState.players += 1;
+
+                        if (gameState.players == 2) {
+                            gameState.gameStatus = 'In Progress';
+                        }
                         socket.gameID = gameID;
                         socket.counter = 0; 
+                        await gameState.save();
 
                         console.log(`Socket ${socket.id} joined game ${gameID}`);
                         console.log('socket room has players:', io.sockets.adapter.rooms.get(gameID).size);
@@ -23,6 +39,7 @@ const handleSocket = (io) => {
                         socket.emit('counterUpdated', socket.counter);
                     } else {
                         console.log('Game is full');
+                        console.log('gamestate:', gameState);
                         socket.emit('error', { message: 'Game is full' });
                     }
                 } else {

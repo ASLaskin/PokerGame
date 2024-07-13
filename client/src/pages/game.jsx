@@ -9,14 +9,11 @@ const Game = ({}) => {
     const { state } = useLocation();
     const { name } = state;
 
-    if (name === undefined) {
-        name = "Player";
-    }
 
     useEffect(() => {
         const newSocket = io('http://localhost:3000');
 
-        newSocket.emit('joinGame', gameID);
+        newSocket.emit('joinGame', gameID, name);
         newSocket.on('counterUpdated', (newCounter) => {
             console.log('Counter updated:', newCounter);
             setCounter(newCounter);

@@ -27,7 +27,7 @@ const Home = () => {
 
     const handleJoinGame = async () => {
         try {
-            await axios.post('http://localhost:3000/api/game/join', { gameID });
+            await axios.post('http://localhost:3000/api/game/join', { gameID, name });
             navigate(`/game/${gameID}`, { state: { name } });
         } catch (error) {
             console.error('Error joining game:', error);
