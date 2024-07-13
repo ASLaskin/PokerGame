@@ -1,5 +1,4 @@
 const GameState = require('./models/gameState');
-const GameManager = require('./logic/gameManager');
 
 const handleSocket = (io) => {
     io.on('connection', (socket) => {
