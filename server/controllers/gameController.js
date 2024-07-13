@@ -2,7 +2,7 @@ const GameState = require('../models/gameState');
 const makeid = require('../tools/utility');
 
 const createGame = async (req, res) => {
-    const players = 1;
+    const players = 0;
     const gameID = makeid(6);
     const gameState = new GameState({
         gameID: gameID,
@@ -29,7 +29,6 @@ const joinGame = async (req, res) => {
             return res.status(404).json({ message: 'Game not found' });
         }
         gameState.players += 1;
-        console.log("here")
         await gameState.save();
 
         req.session.gameID = gameID; 

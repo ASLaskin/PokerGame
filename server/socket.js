@@ -6,19 +6,24 @@ const handleSocket = (io) => {
         console.log('New client connected:', socket.id);
 
         socket.on('joinGame', async (gameID) => {
+            console.log('trying to join game:', gameID); 
             try {
                 const gameState = await GameState.findOne({ gameID });
 
                 if (gameState) {
-                    if (gameState.players.length < 2) {
+                    console.log('Game found:');
+                    console.log('game has players:', gameState.players);
+                    if (gameState.players < 2) {
                         socket.join(gameID);
                         socket.gameID = gameID;
                         socket.counter = 0; 
 
                         console.log(`Socket ${socket.id} joined game ${gameID}`);
+                        console.log('socket room has players:', io.sockets.adapter.rooms.get(gameID).size);
 
                         socket.emit('counterUpdated', socket.counter);
                     } else {
+                        console.log('Game is full');
                         socket.emit('error', { message: 'Game is full' });
                     }
                 } else {

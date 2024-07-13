@@ -2,30 +2,33 @@ import React, { useState, useEffect } from "react";
 import io from "socket.io-client";
 import { useParams } from "react-router-dom";
 
-const socket = io();
-
 const Game = () => {
     const { gameID } = useParams();
     const [counter, setCounter] = useState(0);
+    const [socket, setSocket] = useState(null);
 
     useEffect(() => {
-        console.log('Game page loaded');
-        socket.emit('joinGame', gameID);
+        const newSocket = io('http://localhost:3000');
 
-        
-        socket.on('counterUpdated', (newCounter) => {
-            console.log('Counter updated:', newCounter); 
+        newSocket.emit('joinGame', gameID);
+        newSocket.on('counterUpdated', (newCounter) => {
+            console.log('Counter updated:', newCounter);
             setCounter(newCounter);
         });
 
+        setSocket(newSocket);
+
         return () => {
-            socket.off('counterUpdated');
+            newSocket.off('counterUpdated');
+            newSocket.disconnect();
         };
     }, [gameID]);
 
     const handleIncrement = () => {
-        console.log('Increment button clicked'); 
-        socket.emit('incrementCounter');
+        if (socket) {
+            console.log('Increment button clicked');
+            socket.emit('incrementCounter');
+        }
     };
 
     return (

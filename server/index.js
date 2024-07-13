@@ -14,8 +14,6 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: 'http://localhost:5173', // Replace with your front-end URL in production
-    methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type'],
     credentials: true,
   }
