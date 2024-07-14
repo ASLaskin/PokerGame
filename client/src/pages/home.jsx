@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import backgroundImage from '../assets/purple.jpg';
 
 const Home = () => {
     const [name, setName] = useState('');
@@ -35,45 +36,48 @@ const Home = () => {
     };
 
     return (
-        <div className="bg-gray-100 flex justify-center items-center h-screen">
-            <div className="bg-white p-8 rounded-lg shadow-md">
-                <div className="flex justify-center">
-                    <h1 className="text-3xl mb-6">PokerUp</h1>
+        <>
+        <div className="bg-cover bg-center h-screen flex items-center justify-center" style={{ backgroundImage: `url(${backgroundImage})` }}>
+            <div className="bg-black bg-opacity-50 w-full h-full absolute"></div>
+            <div className="relative flex flex-col z-10  p-10 rounded-lg shadow-lg max-w-md w-full h-1/2 text-center">
+                <div className='flex flex-col p-5'>
+                    <h1 className="text-6xl font-bold mb-6 text-white">POKERUP</h1>
+                    <h2 className='text-2xl font-bold text-gray-200'>Get your poker</h2>
                 </div>
-                <div className="flex justify-center">
-                    <input
-                        type="text"
-                        value={name}
-                        onChange={handleNameChange}
-                        className="border rounded-lg px-4 py-2 mb-4"
-                        placeholder="Enter your name"
-                    />
-                </div>
-                <div className="flex justify-center">
-                    <button
-                        onClick={handleCreateGame}
-                        className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg"
-                    >
-                        Create Game
-                    </button>
-                </div>
-                <div className="flex justify-center mt-4">
+                <input
+                    type="text"
+                    value={name}
+                    onChange={handleNameChange}
+                    className="w-full px-4 py-2 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter your name"
+                />
+                <button
+                    onClick={handleCreateGame}
+                    className="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out"
+                >
+                    Create Game
+                </button>
+                <div className="mt-4 flex items-center">
                     <input
                         type="text"
                         value={gameID}
                         onChange={handleGameIDChange}
-                        className="border rounded-l-lg px-4 py-2 focus:outline-none focus:border-blue-500 w-40"
+                        className="flex-grow px-4 py-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="Game ID"
                     />
                     <button
                         onClick={handleJoinGame}
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-r-lg"
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-r-lg transition duration-300 ease-in-out"
                     >
                         Join
                     </button>
                 </div>
             </div>
         </div>
+        <div>
+            We Play Poker Here
+        </div>
+        </>
     );
 };
 

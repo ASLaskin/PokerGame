@@ -4,42 +4,38 @@ import { useLocation, useParams } from "react-router-dom";
 
 const Game = ({}) => {
     const { gameID } = useParams();
-    const [counter, setCounter] = useState(0);
     const [socket, setSocket] = useState(null);
     const { state } = useLocation();
     const { name } = state;
+    const [opponent, setOpponent] = useState('');
 
 
     useEffect(() => {
         const newSocket = io('http://localhost:3000');
 
         newSocket.emit('joinGame', gameID, name);
-        newSocket.on('counterUpdated', (newCounter) => {
-            console.log('Counter updated:', newCounter);
-            setCounter(newCounter);
+        newSocket.on('gameStart', (players) => {
+            console.log('game started:', players);
+            const opponent = players.find((player) => player !== name);
+            setOpponent(opponent);
+            console.log('opponent:', opponent);
         });
+
 
         setSocket(newSocket);
 
         return () => {
-            newSocket.off('counterUpdated');
+            //newSocket.off('counterUpdated');
             newSocket.disconnect();
         };
     }, [gameID]);
 
-    const handleIncrement = () => {
-        if (socket) {
-            console.log('Increment button clicked');
-            socket.emit('incrementCounter');
-        }
-    };
 
     return (
         <div>
             <h1>Game: {gameID}</h1>
-            <h2>Counter: {counter}</h2>
             <h3>Player: {name}</h3>
-            <button onClick={handleIncrement}>Increment Counter</button>
+            <h3>Opponent: {opponent.name}</h3>
         </div>
     );
 };

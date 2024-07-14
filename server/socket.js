@@ -36,7 +36,9 @@ const handleSocket = (io) => {
                         console.log(`Socket ${socket.id} joined game ${gameID}`);
                         console.log('socket room has players:', io.sockets.adapter.rooms.get(gameID).size);
 
-                        socket.emit('counterUpdated', socket.counter);
+                        if(gameState.players == 2) {
+                            io.to(gameID).emit('gameStart', games[gameID].getPlayers());
+                        }
                     } else {
                         console.log('Game is full');
                         console.log('gamestate:', gameState);
@@ -49,13 +51,6 @@ const handleSocket = (io) => {
                 console.error('Error joining game:', error);
                 socket.emit('error', { message: 'Internal server error' });
             }
-        });
-
-        socket.on('incrementCounter', () => {
-            console.log('Incrementing counter:', socket.counter); // Add logging here
-            socket.counter += 1;
-            console.log('New counter value:', socket.counter); // Add logging here
-            io.to(socket.gameID).emit('counterUpdated', socket.counter);
         });
 
         socket.on('disconnect', async () => {
