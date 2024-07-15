@@ -2,11 +2,10 @@ import React, { useState, useEffect } from "react";
 import io from "socket.io-client";
 import { useLocation, useParams } from "react-router-dom";
 
-const socket = io('localhost:3000');
 
+const socket = io('localhost:3000');
 const Game = () => {
     const { gameID } = useParams();
-    const [socket, setSocket] = useState(null);
     const { state } = useLocation();
     const { name } = state;
     const [opponent, setOpponent] = useState('');
