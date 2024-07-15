@@ -33,8 +33,10 @@ const handleSocket = (io) => {
                         socket.counter = 0; 
                         await gameState.save();
 
-                        console.log(`Socket ${socket.id} joined game ${gameID}`);
-                        console.log('socket room has players:', io.sockets.adapter.rooms.get(gameID).size);
+                        // console.log(`Socket ${socket.id} joined game ${gameID}`);
+                        // console.log('socket room has players:', io.sockets.adapter.rooms.get(gameID).size);
+                        
+                        //it might be worth to emit the pokerGame or Player objects to client
 
                         if(gameState.players == 2) {
                             io.to(gameID).emit('gameStart', games[gameID].getPlayers());

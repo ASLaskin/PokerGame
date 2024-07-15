@@ -16,16 +16,18 @@ const Game = ({}) => {
         newSocket.emit('joinGame', gameID, name);
         newSocket.on('gameStart', (players) => {
             console.log('game started:', players);
-            const opponent = players.find((player) => player !== name);
-            setOpponent(opponent);
-            console.log('opponent:', opponent);
+            for (let player of players) {
+                if (player.name !== name) {
+                    setOpponent(player);
+                }
+            }
         });
 
 
         setSocket(newSocket);
 
         return () => {
-            //newSocket.off('counterUpdated');
+            newSocket.off('gameStart');
             newSocket.disconnect();
         };
     }, [gameID]);
