@@ -1,12 +1,19 @@
 const Player = require('./player');
 
 class PokerGame {
-  constructor(gameId, players) {
+  constructor(gameId) {
     this.gameId = gameId;
-    this.players = players.map(player => new Player(player.id, player.name));
+    this.players = [];
     this.gameState = {
       status: 'waiting',
     };
+  }
+  addPlayer(name) {
+    const player = new Player(name);
+    this.players.push(player);
+  }
+  getPlayers() {
+    return this.players;
   }
 
   updateState(newState) {

@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from "react";
 import io from "socket.io-client";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 
 const socket = io('localhost:3000');
 
 const Game = () => {
     const { gameID } = useParams();
-    const [counter, setCounter] = useState(0);
+    const [socket, setSocket] = useState(null);
+    const { state } = useLocation();
+    const { name } = state;
+    const [opponent, setOpponent] = useState('');
+
 
     useEffect(() => {
         socket.on('connect', () => {
@@ -26,16 +30,12 @@ const Game = () => {
        
     }, [gameID]);
 
-    const handleIncrement = () => {
-        console.log('Increment button clicked'); 
-        socket.emit('incrementCounter');
-    };
 
     return (
         <div>
             <h1>Game: {gameID}</h1>
-            <h2>Counter: {counter}</h2>
-            <button onClick={handleIncrement}>Increment Counter</button>
+            <h3>Player: {name}</h3>
+            <h3>Opponent: {opponent.name}</h3>
         </div>
     );
 };

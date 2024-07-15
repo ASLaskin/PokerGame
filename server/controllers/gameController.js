@@ -2,12 +2,14 @@ const GameState = require('../models/gameState');
 const makeid = require('../tools/utility');
 
 const createGame = async (req, res) => {
-    const players = 1;
+    const players = 0;
     const gameID = makeid(6);
+    playerNames = [req.body.name];
     const gameState = new GameState({
         gameID: gameID,
         players: players,
-        gameStatus: 'waiting'
+        gameStatus: 'waiting',
+        playerNames: playerNames
     });
 
     try {
@@ -28,11 +30,11 @@ const joinGame = async (req, res) => {
         if (!gameState) {
             return res.status(404).json({ message: 'Game not found' });
         }
-        gameState.players += 1;
-        console.log("here")
+        gameState.playerNames.push(req.body.name);
         await gameState.save();
 
         req.session.gameID = gameID; 
+        req.session.playerName = req.body.name;
         req.session.save(); 
 
         res.status(200).json(gameState);
