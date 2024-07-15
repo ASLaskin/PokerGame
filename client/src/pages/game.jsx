@@ -3,9 +3,11 @@ import io from "socket.io-client";
 import { useLocation, useParams } from "react-router-dom";
 
 
+
 const socket = io('localhost:3000');
 const Game = () => {
     const { gameID } = useParams();
+
     const { state } = useLocation();
     const { name } = state;
     const [opponent, setOpponent] = useState('');
@@ -26,7 +28,7 @@ const Game = () => {
                 socket.off('counterUpdated');
             };
         })
-       
+
     }, [gameID]);
 
 
