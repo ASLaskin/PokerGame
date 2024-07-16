@@ -13,6 +13,12 @@ const Game = ({}) => {
     useEffect(() => {
         const newSocket = io('http://localhost:3000');
 
+        // if (name) {
+        //     console.log('joining game with name:', name);
+        //     newSocket.emit('joinGame', gameID, name);
+        // }else {
+        //    console.log('someone joined using link, time to prompt them for name')
+        // }
         newSocket.emit('joinGame', gameID, name);
         newSocket.on('gameStart', (players) => {
             console.log('game started:', players);
@@ -28,9 +34,10 @@ const Game = ({}) => {
 
         return () => {
             newSocket.off('gameStart');
+            newSocket.off("joinGame");
             newSocket.disconnect();
         };
-    }, [gameID]);
+    }, [gameID, name]);
 
 
     return (

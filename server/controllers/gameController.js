@@ -4,7 +4,7 @@ const makeid = require('../tools/utility');
 const createGame = async (req, res) => {
     const players = 0;
     const gameID = makeid(6);
-    playerNames = [req.body.name];
+    const playerNames = [req.body.name];
     const gameState = new GameState({
         gameID: gameID,
         players: players,
@@ -19,9 +19,9 @@ const createGame = async (req, res) => {
         req.session.save();
         res.status(201).json(gameState);
     } catch (error) {
-        res.status(400).json({message: error.message});
+        res.status(400).json({ message: error.message });
     }
-}
+};
 const joinGame = async (req, res) => {
     const { gameID } = req.body;
 
@@ -30,12 +30,17 @@ const joinGame = async (req, res) => {
         if (!gameState) {
             return res.status(404).json({ message: 'Game not found' });
         }
+        if (gameState.players >= 2) {
+            return res.status(400).json({ message: 'Game is full' });
+        }
+        gameState.players += 1;
         gameState.playerNames.push(req.body.name);
+        gameState.gameStatus = 'full'; 
         await gameState.save();
 
-        req.session.gameID = gameID; 
+        req.session.gameID = gameID;
         req.session.playerName = req.body.name;
-        req.session.save(); 
+        req.session.save();
 
         res.status(200).json(gameState);
     } catch (error) {
@@ -43,4 +48,28 @@ const joinGame = async (req, res) => {
     }
 };
 
-module.exports = { createGame, joinGame };
+const matchMake = async (req, res) => {
+    try {
+        let gameState = await GameState.findOne({ players: { $lt: 2 }, gameStatus: 'waiting' });
+        
+        if (gameState) {
+            gameState.playerNames.push(req.body.name);
+            if (gameState.players === 2) {
+                gameState.gameStatus = 'full'; 
+            }
+            await gameState.save();
+
+            req.session.gameID = gameState.gameID;
+            req.session.playerName = req.body.name;
+            req.session.save();
+
+            res.status(200).json(gameState);
+        } else {
+            await createGame(req, res);
+        }
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+module.exports = { createGame, joinGame, matchMake };
