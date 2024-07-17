@@ -61,10 +61,6 @@ class PokerGame {
       this.players[i].hand.push(this.deck[this.di]);
       this.di += 1
     }
-    const handString = "AD KS QC JH JS QH TS";
-    console.log(PokerEvaluator.evalHand(['As', 'Ac', 'Qs']));
-    console.log(PokerEvaluator.evalHand(['Ks', 'KC', 'Qs']));
-    console.log(PokerEvaluator.evalHand(['KH', 'KD', 'Qs']));
   }
 
   collectBlinds() {
