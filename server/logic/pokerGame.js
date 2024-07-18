@@ -25,7 +25,6 @@ class PokerGame {
       }
     }
 
-    console.log(this.deck);
 
     this.gameState = {
       status: 'waiting',
@@ -41,6 +40,8 @@ class PokerGame {
   }
 
   startGame() {
+    this.shuffleCards();
+    this.dealCards();
   }
 
   shuffleCards() {
@@ -51,7 +52,6 @@ class PokerGame {
       this.deck.splice(j,1);
     }
     this.deck = tempDeck;
-    console.log(this.deck);
   }
 
   dealCards() {
@@ -61,6 +61,15 @@ class PokerGame {
       this.players[i].hand.push(this.deck[this.di]);
       this.di += 1
     }
+  }
+
+  getHands() {
+    let hands = new Map();
+    for(let i = 0; i < this.players.length; i++) {
+      hands.set(this.players[i].name, this.players[i].hand);
+    }
+    console.log(hands);
+    return hands;
   }
 
   collectBlinds() {

@@ -8,6 +8,7 @@ const Game = ({}) => {
     const { state } = useLocation();
     const { name } = state;
     const [opponent, setOpponent] = useState('');
+    const [currentHand, setCurrentHand] = useState('');
 
 
     useEffect(() => {
@@ -27,6 +28,16 @@ const Game = ({}) => {
                     setOpponent(player);
                 }
             }
+            newSocket.emit('startRound', gameID);
+        });
+        newSocket.on('roundStart', (handsArray) => {
+            console.log('getting hands:', handsArray);
+            const hands = new Map(handsArray);
+            for (let [player, hand] of hands) {
+                if (player === name) {
+                    setCurrentHand(hand);
+                }
+            }
         });
 
 
@@ -44,6 +55,7 @@ const Game = ({}) => {
         <div>
             <h1>Game: {gameID}</h1>
             <h3>Player: {name}</h3>
+            <p>Current Hand: {currentHand}</p>
             <h3>Opponent: {opponent.name}</h3>
         </div>
     );

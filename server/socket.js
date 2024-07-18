@@ -8,7 +8,7 @@ const handleSocket = (io) => {
         console.log('New client connected:', socket.id);
 
         socket.on('joinGame', async (gameID, name) => {
-            console.log('trying to join game:', gameID); 
+            console.log('trying to join game:', gameID);
             try {
                 const gameState = await GameState.findOne({ gameID });
 
@@ -32,15 +32,15 @@ const handleSocket = (io) => {
                             gameState.gameStatus = 'In Progress';
                         }
                         socket.gameID = gameID;
-                        socket.counter = 0; 
+                        socket.counter = 0;
                         await gameState.save();
 
                         // console.log(`Socket ${socket.id} joined game ${gameID}`);
                         // console.log('socket room has players:', io.sockets.adapter.rooms.get(gameID).size);
-                        
+
                         //it might be worth to emit the pokerGame or Player objects to client
 
-                        if(gameState.players == 2) {
+                        if (gameState.players == 2) {
                             io.to(gameID).emit('gameStart', games[gameID].getPlayers());
                         }
                     } else {
@@ -57,27 +57,33 @@ const handleSocket = (io) => {
             }
         });
 
-        socket.on('disconnect', async () => {
-            console.log('Client disconnected:', socket.id);
-            if (socket.gameID) {
-                try {
-                    const gameState = await GameState.findOne({ gameID: socket.gameID });
-                    if (gameState) {
-                        gameState.players -= 1;
-                        //change to properly handle player disconnect
-                        await gameState.save();
-
-                        //delete game if no players are left
-                        if (gameState.players.length === 0) {
-                            await GameState.deleteOne({ gameID: socket.gameID });
-                        }
-                    }
-                } catch (error) {
-                    console.error('Error on disconnect:', error);
-                }
-            }
+        socket.on('startRound', async (gameID) => {
+            games[gameID].startGame();
+            const hands = games[gameID].getHands();
+            io.to(gameID).emit('roundStart', Array.from(hands.entries()));
         });
-    });
-};
+     
+        socket.on('disconnect', async () => {
+                console.log('Client disconnected:', socket.id);
+                if (socket.gameID) {
+                    try {
+                        const gameState = await GameState.findOne({ gameID: socket.gameID });
+                        if (gameState) {
+                            gameState.players -= 1;
+                            //change to properly handle player disconnect
+                            await gameState.save();
 
-module.exports = { handleSocket };
+                            //delete game if no players are left
+                            if (gameState.players.length === 0) {
+                                await GameState.deleteOne({ gameID: socket.gameID });
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error on disconnect:', error);
+                    }
+                }
+            });
+        });
+    };
+
+    module.exports = { handleSocket };

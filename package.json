@@ -11,7 +11,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "poker-evaluator": "^2.1.0"
   },
   "devDependencies": {
     "@types/node": "^20.14.10"
