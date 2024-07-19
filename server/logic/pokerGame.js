@@ -10,6 +10,7 @@ class PokerGame {
     this.dealer = 0;
     this.pot = 0;
     this.betToMatch = 0;
+    this.gameStage = 0;
     this.di = 0;
     this.deck = [];
     this.table = [];
@@ -52,6 +53,13 @@ class PokerGame {
       this.deck.splice(j,1);
     }
     this.deck = tempDeck;
+    this.di = 0;
+    console.log(this.deck);
+  }
+
+  getNewCard() {
+    this.di++
+    return this.deck[this.di - 1]
   }
 
   dealCards() {
@@ -98,6 +106,14 @@ class PokerGame {
     }
   }
 
+  rotateActivePlayer() {
+    if(this.activePlayer + 1 >= this.players.length) {
+      this.activePlayer = 0;
+    } else {
+      this.activePlayer++;
+    }
+  }
+
   nextBettingRound() {
     for(let i = 0; i < this.bets.length; i++) {
       this.bets[i] = 0;
@@ -137,6 +153,13 @@ class PokerGame {
     this.betToMatch = this.bets[this.activePlayer];
   }
 
+  handleFlop() {
+    this.di++
+    this.table.push(this.getNewCard());
+    this.table.push(this.getNewCard());
+    this.table.push(this.getNewCard());
+  }
+
   determineWinner() {
     let hands = [];
     let indicies = [];
@@ -169,6 +192,42 @@ class PokerGame {
       return drawPlayers;
     } 
     return [players[wi]];
+  }
+
+  distributePot() {
+    let winners = this.determineWinner();
+    let payout = this.pot;
+    if(winners.length > 1) {
+      payout /= winners.length;
+      for(let i = 0; i < winners.length; i++) {
+        winners[i].chips += payout;
+      }
+    } else {
+      winners[0].chips += payout;
+    }
+  }
+
+  resetRound() {
+    this.pot = 0;
+    this.betToMatch = 0;
+    this.gameStage = 0;
+    this.table = [];
+    this.shuffleCards();
+    this.rotateDealer();
+
+  }
+
+  #getters
+  getPot() {
+    return this.pot;
+  }
+
+  getBetToMatch() {
+    return this.betToMatch;
+  }
+
+  getBets() {
+    return this.bets;
   }
 
   updateState(newState) {

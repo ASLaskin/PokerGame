@@ -21,8 +21,6 @@ const handleSocket = (io) => {
                             games[gameID] = new pokerGame(gameID);
                         }
                         games[gameID].addPlayer(name);
-                        games[gameID].shuffleCards();
-                        games[gameID].dealCards();
 
                         console.log('player added to game:', games[gameID].getPlayers());
 
