@@ -2,6 +2,11 @@ import React, { useState, useEffect } from "react";
 import io from "socket.io-client";
 import { useLocation, useParams } from "react-router-dom";
 import './game.css';
+import cardImages from '../assets/cards/card';
+
+const getCardImage = (card) => {
+    return cardImages[card];
+};
 
 const Game = () => {
     const { gameID } = useParams();
@@ -39,10 +44,10 @@ const Game = () => {
         return () => {
             newSocket.off('gameStart');
             newSocket.off("joinGame");
+            newSocket.off("roundStart");
             newSocket.disconnect();
         };
     }, [gameID, name]);
-
 
     return (
         <div className="game-board">
@@ -56,15 +61,15 @@ const Game = () => {
                 <h3>Player: {name}</h3>
                 <div className="hand">
                     {currentHand.map((card, index) => (
-                        <span key={index} className="card">{card}</span>
+                        <img key={index} src={getCardImage(card)} alt={card} className="card" />
                     ))}
                 </div>
             </div>
             <div className="controls">
                 <button className="button bg-green-700">Check</button>
-                <button className="button bg-red-700" >Bet</button>
-                <button className="button bg-gray-700" >Call</button>
-                <button className="button bg-purple-700" >Fold</button>
+                <button className="button bg-red-700">Bet</button>
+                <button className="button bg-gray-700">Call</button>
+                <button className="button bg-purple-700">Fold</button>
             </div>
         </div>
     );

@@ -63,11 +63,8 @@ class PokerGame {
   }
 
   dealCards() {
-    for(let i = 0; i < this.players.length; i++) {
-      this.players[i].hand.push(this.deck[this.di]);
-      this.di += 1
-      this.players[i].hand.push(this.deck[this.di]);
-      this.di += 1
+    for(let player of this.players) {
+      player.hand = [this.getNewCard(), this.getNewCard()];
     }
   }
 
