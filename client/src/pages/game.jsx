@@ -2,12 +2,21 @@ import React, { useState, useEffect } from "react";
 import io from "socket.io-client";
 import { useLocation, useParams } from "react-router-dom";
 import './game.css';
-import cardImages from '../assets/cards/card';
+import cardImages from '../assets/cards/cardImages';
+
+
+const reverseString = (str) => str.split('').reverse().join('');
 
 const getCardImage = (card) => {
-    return cardImages[card];
+    const reversedCardName = reverseString(card);
+    if (cardImages[reversedCardName]) {
+        return cardImages[reversedCardName];
+    } else {
+        console.error(`No image found for card: ${card}`);
+        console.log('Available card images:', Object.keys(cardImages));
+        return null;
+    }
 };
-
 const Game = () => {
     const { gameID } = useParams();
     const [socket, setSocket] = useState(null);
@@ -61,7 +70,12 @@ const Game = () => {
                 <h3>Player: {name}</h3>
                 <div className="hand">
                     {currentHand.map((card, index) => (
-                        <img key={index} src={getCardImage(card)} alt={card} className="card" />
+                        <img 
+                            key={index} 
+                            src={getCardImage(card)} 
+                            alt={card} 
+                            className="card" 
+                        />
                     ))}
                 </div>
             </div>
