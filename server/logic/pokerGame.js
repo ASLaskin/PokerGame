@@ -150,11 +150,52 @@ class PokerGame {
     this.betToMatch = this.bets[this.activePlayer];
   }
 
+  handlePlayerAction(player, amount, action) {
+    if(action == 'b') {
+      this.handleBet(player, amount);
+    } else if(action == 'f') {
+      this.handleFold(player);
+    } else if(action == 'c') {
+      this.handleCall(player);
+    } else if(action == 'r') {
+      this.handleRaise(player, amount);
+    }
+    this.rotateActivePlayer();
+  }
+
   handleFlop() {
-    this.di++
+    this.di++;
+    this.betToMatch = 0;
     this.table.push(this.getNewCard());
     this.table.push(this.getNewCard());
     this.table.push(this.getNewCard());
+    this.activePlayer = this.dealer + 1;
+    if(this.activePlayer >= this.players.length) {
+      this.activePlayer = 0;
+    }
+    this.gameStage++;
+  }
+
+  handleTurn() {
+    this.di++;
+    this.betToMatch = 0;
+    this.table.push(this.getNewCard());
+    this.activePlayer = this.dealer + 1;
+    if(this.activePlayer >= this.players.length) {
+      this.activePlayer = 0;
+    }
+    this.gameStage++;
+  }
+
+  handleRiver() {
+    this.di++;
+    this.betToMatch = 0;
+    this.table.push(this.getNewCard());
+    this.activePlayer = this.dealer + 1;
+    if(this.activePlayer >= this.players.length) {
+      this.activePlayer = 0;
+    }
+    this.gameStage++;
   }
 
   determineWinner() {
@@ -225,6 +266,10 @@ class PokerGame {
 
   getBets() {
     return this.bets;
+  }
+
+  getActivePlayer() {
+    return this.players[this.activePlayer];
   }
 
   updateState(newState) {
