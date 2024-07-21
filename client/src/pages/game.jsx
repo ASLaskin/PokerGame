@@ -25,7 +25,9 @@ const Game = () => {
     const { name } = state;
     const [opponent, setOpponent] = useState('');
     const [currentHand, setCurrentHand] = useState([]);
-    const [opponentHand, setOpponentHand] = useState([]); 
+    const [opponentHand, setOpponentHand] = useState([]);
+    const [chipStack, setChipStack] = useState(1000);
+    const [opponentChipStack, setOpponentChipStack] = useState(1000);
 
     useEffect(() => {
         const newSocket = io('http://localhost:3000');
@@ -47,7 +49,7 @@ const Game = () => {
                 if (player === name) {
                     setCurrentHand(hand);
                 } else {
-                    setOpponentHand(hand); 
+                    setOpponentHand(hand);
                 }
             }
         });
@@ -62,18 +64,20 @@ const Game = () => {
         };
     }, [gameID, name]);
 
-    //bruh
     return (
         <div className="game-board flex flex-col items-center justify-between h-screen bg-center bg-cover bg-no-repeat p-5 box-border text-white">
             <div className="flex flex-col items-center w-full">
-                <h3>Opponent: {opponent.name}</h3>
+                <div className="flex space-x-4">
+                    <h3>Opponent: {opponent.name}</h3>
+                    <h3>Chip Stack: {opponentChipStack}</h3>
+                </div>
                 <div className="flex justify-center mt-2.5">
                     {opponentHand.map((card, index) => (
-                        <img 
-                            key={index} 
-                            src={cardBack} 
-                            alt="Card Back" 
-                            className="bg-white text-black p-2.5 mx-1 border border-black rounded"
+                        <img
+                            key={index}
+                            src={cardBack}
+                            alt="Card Back"
+                            className="h-60 p-2.5 mx-1"
                         />
                     ))}
                 </div>
@@ -82,14 +86,17 @@ const Game = () => {
                 <h1>Game: {gameID}</h1>
             </div>
             <div className="flex flex-col items-center w-full">
-                <h3>Player: {name}</h3>
+                <div className="flex space-x-4">
+                    <h3>Player: {name}</h3>
+                    <h3>Chip Stack: {chipStack} </h3>
+                </div>
                 <div className="flex justify-center mt-2.5">
                     {currentHand.map((card, index) => (
-                        <img 
-                            key={index} 
-                            src={getCardImage(card)} 
-                            alt={card} 
-                            className="bg-white text-black p-2.5 mx-1 border border-black rounded"
+                        <img
+                            key={index}
+                            src={getCardImage(card)}
+                            alt={card}
+                            className="h-60 p-2.5 mx-1"
                         />
                     ))}
                 </div>
