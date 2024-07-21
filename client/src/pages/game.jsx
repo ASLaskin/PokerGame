@@ -62,6 +62,7 @@ const Game = () => {
         };
     }, [gameID, name]);
 
+    //bruh
     return (
         <div className="game-board flex flex-col items-center justify-between h-screen bg-center bg-cover bg-no-repeat p-5 box-border text-white">
             <div className="flex flex-col items-center w-full">
