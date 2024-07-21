@@ -101,7 +101,7 @@ const Game = () => {
                     ))}
                 </div>
             </div>
-            <div className="flex justify-end fixed bottom-5 right-5">
+            <div className="flex justify-center lg:justify-end fixed bottom-5 w-full lg:w-auto lg:right-5">
                 <button className="text-white border-none py-2 px-5 mx-1 rounded bg-green-700 hover:bg-gray-800">Check</button>
                 <button className="text-white border-none py-2 px-5 mx-1 rounded bg-red-700 hover:bg-gray-800">Bet</button>
                 <button className="text-white border-none py-2 px-5 mx-1 rounded bg-gray-700 hover:bg-gray-800">Call</button>
