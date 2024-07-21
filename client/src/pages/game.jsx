@@ -3,7 +3,7 @@ import io from "socket.io-client";
 import { useLocation, useParams } from "react-router-dom";
 import './game.css';
 import cardImages from '../assets/cards/cardImages';
-
+import cardBack from '../assets/cardback.svg';
 
 const reverseString = (str) => str.split('').reverse().join('');
 
@@ -17,6 +17,7 @@ const getCardImage = (card) => {
         return null;
     }
 };
+
 const Game = () => {
     const { gameID } = useParams();
     const [socket, setSocket] = useState(null);
@@ -24,6 +25,7 @@ const Game = () => {
     const { name } = state;
     const [opponent, setOpponent] = useState('');
     const [currentHand, setCurrentHand] = useState([]);
+    const [opponentHand, setOpponentHand] = useState([]);
 
     useEffect(() => {
         const newSocket = io('http://localhost:3000');
@@ -44,6 +46,8 @@ const Game = () => {
             for (let [player, hand] of hands) {
                 if (player === name) {
                     setCurrentHand(hand);
+                } else {
+                    setOpponentHand(hand); 
                 }
             }
         });
@@ -62,6 +66,16 @@ const Game = () => {
         <div className="game-board">
             <div className="opponent">
                 <h3>Opponent: {opponent.name}</h3>
+                <div className="hand">
+                    {opponentHand.map((card, index) => (
+                        <img 
+                            key={index} 
+                            src={cardBack}
+                            alt="Card Back" 
+                            className="card" 
+                        />
+                    ))}
+                </div>
             </div>
             <div className="table">
                 <h1>Game: {gameID}</h1>
