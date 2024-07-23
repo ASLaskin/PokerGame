@@ -64,6 +64,18 @@ const Game = () => {
         };
     }, [gameID, name]);
 
+    const handleBet = () => {
+        socket.emit('handleBet', gameID, name);
+    };
+
+    const handleCall = () => {
+        socket.emit('handleCall', gameID, name);
+    };
+
+    const handleCheck = () => {
+        socket.emit('handleCheck', gameID, name);
+    };
+
     return (
         <div className="game-board flex flex-col items-center justify-between h-screen bg-center bg-cover bg-no-repeat p-5 box-border text-white">
             <div className="flex flex-col items-center w-full">
@@ -101,11 +113,11 @@ const Game = () => {
                     ))}
                 </div>
             </div>
-            <div className="flex justify-center lg:justify-end fixed bottom-5 w-full lg:w-auto lg:right-5">
-                <button className="text-white border-none py-2 px-5 mx-1 rounded bg-green-700 hover:bg-gray-800">Check</button>
-                <button className="text-white border-none py-2 px-5 mx-1 rounded bg-red-700 hover:bg-gray-800">Bet</button>
-                <button className="text-white border-none py-2 px-5 mx-1 rounded bg-gray-700 hover:bg-gray-800">Call</button>
-                <button className="text-white border-none py-2 px-5 mx-1 rounded bg-purple-700 hover:bg-gray-800">Fold</button>
+            <div className="controls">
+                <button className="button bg-green-700" onClick={handleCheck}>Check</button>
+                <button className="button bg-red-700" onClick={handleBet}>Bet</button>
+                <button className="button bg-gray-700" onClick={handleCall}>Call</button>
+                <button className="button bg-purple-700" >Fold</button>
             </div>
         </div>
     );

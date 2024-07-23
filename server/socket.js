@@ -60,6 +60,23 @@ const handleSocket = (io) => {
             const hands = games[gameID].getHands();
             io.to(gameID).emit('roundStart', Array.from(hands.entries()));
         });
+
+        socket.on('handleBet', async (gameID, name) => {
+            if(games[gameID].getActivePlayer().name == name) {
+                games[gameID].handlePlayerAction("hi", 40, 'b');
+            }
+        });
+        
+        socket.on('handleCall', async (gameID, name) => {
+            if(games[gameID].getActivePlayer().name == name) {
+                games[gameID].handlePlayerAction("hi", 0, 'c');
+            }
+        });
+
+        socket.on('handleCheck', async (gameID, name) => {
+            console.log(games[gameID].getActivePlayer().name);
+            console.log(games[gameID].getActionPlayer().name);
+        });
      
         socket.on('disconnect', async () => {
                 console.log('Client disconnected:', socket.id);

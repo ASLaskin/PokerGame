@@ -7,6 +7,7 @@ class PokerGame {
     this.players = [];
     this.bets = [];
     this.activePlayer = 0;
+    this.actionPlayer = 0;
     this.dealer = 0;
     this.pot = 0;
     this.betToMatch = 0;
@@ -54,7 +55,6 @@ class PokerGame {
     }
     this.deck = tempDeck;
     this.di = 0;
-    console.log(this.deck);
   }
 
   getNewCard() {
@@ -115,14 +115,18 @@ class PokerGame {
     for(let i = 0; i < this.bets.length; i++) {
       this.bets[i] = 0;
     }
+    this.pot = 0;
+    this.betToMatch = 0;
+    this.table = [];
     this.rotateDealer();
     this.shuffleCards();
     this.dealCards();
     this.collectBlinds();
     this.activePlayer = this.dealer + 3;
     if(this.activePlayer >= this.players.length) {
-      this.activePlayer -= this.players.length;
+      this.activePlayer -= (this.players.length+1);
     }
+    console.log(this.activePlayer);
   }
 
   handleBet(player, amount) {
@@ -130,6 +134,8 @@ class PokerGame {
     this.pot += amount;
     this.players[this.activePlayer].chips -= amount;
     this.betToMatch = this.bets[this.activePlayer];
+    this.action = this.activePlayer;
+    console.log(amount);
   }
 
   handleFold(player) {
@@ -141,6 +147,7 @@ class PokerGame {
     this.bets[this.activePlayer] = this.betToMatch;
     this.pot += call;
     this.players[this.activePlayer].chips -= call;
+    console.log(this.bets);
   }
 
   handleRaise(player, amount) {
@@ -148,6 +155,11 @@ class PokerGame {
     this.pot += amount;
     this.players[this.activePlayer].chips -= amount;
     this.betToMatch = this.bets[this.activePlayer];
+    this.action = this.activePlayer;
+  }
+
+  handleCheck(player) {
+    this.action = this.activePlayer;
   }
 
   handlePlayerAction(player, amount, action) {
@@ -159,11 +171,17 @@ class PokerGame {
       this.handleCall(player);
     } else if(action == 'r') {
       this.handleRaise(player, amount);
+    } else if(action == 'ch') {
+      this.handleCheck(player);
     }
     this.rotateActivePlayer();
+    if(this.actionPlayer == this.activePlayer) {
+      this.nextStage();
+    }
   }
 
   handleFlop() {
+    console.log("FLOP");
     this.di++;
     this.betToMatch = 0;
     this.table.push(this.getNewCard());
@@ -173,10 +191,11 @@ class PokerGame {
     if(this.activePlayer >= this.players.length) {
       this.activePlayer = 0;
     }
-    this.gameStage++;
+    this.actionPlayer = this.activePlayer;
   }
 
   handleTurn() {
+    console.log("TURN");
     this.di++;
     this.betToMatch = 0;
     this.table.push(this.getNewCard());
@@ -184,10 +203,11 @@ class PokerGame {
     if(this.activePlayer >= this.players.length) {
       this.activePlayer = 0;
     }
-    this.gameStage++;
+    this.actionPlayer = this.activePlayer;
   }
 
   handleRiver() {
+    console.log("RIVER");
     this.di++;
     this.betToMatch = 0;
     this.table.push(this.getNewCard());
@@ -195,7 +215,29 @@ class PokerGame {
     if(this.activePlayer >= this.players.length) {
       this.activePlayer = 0;
     }
+    this.actionPlayer = this.activePlayer;
+  }
+
+  nextStage() {
+    if(this.gameStage == 0) {
+      this.handleFlop();
+    } else if(this.gameStage == 1) {
+      this.handleTurn();
+    } else if(this.gameStage == 2) {
+      this.handleRiver();
+    } else if(this.gameStage == 3) {
+      this.distributePot();
+      this.nextBettingRound();
+    }
+    for(let i = 0; i < this.bets.length; i++) {
+      this.bets[i] = 0;
+    }
     this.gameStage++;
+    if (this.gameStage > 3) {
+      this.gameStage = 0;
+    }
+    console.log(this.gameStage);
+    console.log(this.table);
   }
 
   determineWinner() {
@@ -213,23 +255,25 @@ class PokerGame {
     let drawPlayers = [];
     for(let i = 0; i < hands.length; i++) {
       let temp = this.table;
-      temp.push(hands[i]);
+      temp = temp.concat(hands[i]);
       let val = PokerEvaluator.evalHand(temp).value
+      console.log(temp);
+      console.log(val);
       if(val > winner) {
         draw = true;
         winner = val;
         wi = indicies[i];
-        drawPlayers = [players[wi]];
+        drawPlayers = [this.players[wi]];
       } else if(val == winner) {
         draw = true;
-        drawPlayers.push(players[indicies[i]]);
+        drawPlayers.push(this.players[indicies[i]]);
       }
     }
 
     if(draw) {
       return drawPlayers;
     } 
-    return [players[wi]];
+    return [this.players[wi]];
   }
 
   distributePot() {
@@ -243,6 +287,8 @@ class PokerGame {
     } else {
       winners[0].chips += payout;
     }
+    console.log(winners);
+    console.log(this.players);
   }
 
   resetRound() {
@@ -270,6 +316,10 @@ class PokerGame {
 
   getActivePlayer() {
     return this.players[this.activePlayer];
+  }
+
+  getActionPlayer() {
+    return this.players[this.actionPlayer];
   }
 
   updateState(newState) {
