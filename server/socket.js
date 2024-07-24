@@ -71,6 +71,9 @@ const handleSocket = (io) => {
             if(games[gameID].getActivePlayer().name == name) {
                 games[gameID].handlePlayerAction("hi", 0, 'c');
             }
+           
+            io.to(gameID).emit('updateTable', games[gameID].getTableCards());
+            console.log("Updating table with new cards", games[gameID].getTableCards());
         });
 
         socket.on('handleCheck', async (gameID, name) => {

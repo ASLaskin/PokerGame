@@ -28,6 +28,8 @@ const Game = () => {
     const [opponentHand, setOpponentHand] = useState([]);
     const [chipStack, setChipStack] = useState(1000);
     const [opponentChipStack, setOpponentChipStack] = useState(1000);
+    const [gameState, setGameState] = useState('waiting');
+    const [table, setTable] = useState([]);
 
     useEffect(() => {
         const newSocket = io('http://localhost:3000');
@@ -40,6 +42,7 @@ const Game = () => {
                     setOpponent(player);
                 }
             }
+            setGameState('inProgress');
             newSocket.emit('startRound', gameID);
         });
         newSocket.on('roundStart', (handsArray) => {
@@ -53,6 +56,10 @@ const Game = () => {
                 }
             }
         });
+        newSocket.on("updateTable", (table) => {
+          console.log("This ran")
+          setTable(table);
+        });
 
         setSocket(newSocket);
 
@@ -60,6 +67,7 @@ const Game = () => {
             newSocket.off('gameStart');
             newSocket.off("joinGame");
             newSocket.off("roundStart");
+            newSocket.off("updateTable");
             newSocket.disconnect();
         };
     }, [gameID, name]);
@@ -94,9 +102,22 @@ const Game = () => {
                     ))}
                 </div>
             </div>
-            <div className="flex-grow flex justify-center items-center text-white">
-                <h1>Game: {gameID}</h1>
-            </div>
+            {gameState === 'waiting' ? (
+                <div className="flex-grow flex justify-center items-center text-white">
+                    <h1>Game: {gameID}</h1>
+                </div>
+            ) : (
+                <div className="flex-grow flex justify-center items-center text-white">
+                   {table.map((card, index) => (    
+                        <img
+                            key={index}
+                            src={getCardImage(card)}
+                            alt={card}
+                            className="h-60 p-2.5 mx-1"
+                        />
+                    ))}
+                </div>
+            )}
             <div className="flex flex-col items-center w-full">
                 <div className="flex space-x-4">
                     <h3>Player: {name}</h3>
