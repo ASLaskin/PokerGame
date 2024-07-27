@@ -63,6 +63,11 @@ const Game = () => {
           setTable(table);
         });
 
+        newSocket.on('changeAction', (name) => {
+            console.log("The action is on: ", name);
+            setCurrentAction(name);
+        });
+
         setSocket(newSocket);
 
         return () => {
@@ -74,6 +79,20 @@ const Game = () => {
         };
     }, [gameID, name]);
 
+    const handlePlayerAction = (action, amount) => {
+        if (action === "C") {
+            handleCheck();
+        } else if (action === "B") {
+            handleBet();
+        } else if (action === "CA") {
+            handleCall();
+        } else if (action === "F") {
+            handleFold();
+        }
+        socket.emit("changeAction", gameID);
+        
+    };
+
     const handleBet = () => {
         socket.emit('handleBet', gameID, name);
     };
@@ -84,6 +103,10 @@ const Game = () => {
 
     const handleCheck = () => {
         socket.emit('handleCheck', gameID, name);
+    };
+
+    const handleFold = () => {
+        socket.emit('handleFold', gameID, name);
     };
 
     return (
@@ -145,10 +168,10 @@ const Game = () => {
                 </div>
             </div>
             <div className="controls">
-                <button className="button bg-green-700" onClick={handleCheck}>Check</button>
-                <button className="button bg-red-700" onClick={handleBet}>Bet</button>
-                <button className="button bg-gray-700" onClick={handleCall}>Call</button>
-                <button className="button bg-purple-700" >Fold</button>
+                <button className="button bg-green-700" onClick={() => handlePlayerAction("C",0)}>Check</button>
+                <button className="button bg-red-700" onClick={() => handlePlayerAction("B",40)}>Bet</button>
+                <button className="button bg-gray-700" onClick={() => handlePlayerAction("CA",40)}>Call</button>
+                <button className="button bg-purple-700" onClick={() => handlePlayerAction("F",0)}>Fold</button>
             </div>
         </div>
     );

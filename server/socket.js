@@ -80,6 +80,10 @@ const handleSocket = (io) => {
             console.log(games[gameID].getActivePlayer().name);
             console.log(games[gameID].getActionPlayer().name);
         });
+
+        socket.on("changeAction", async (gameID) => {
+            io.to(gameID).emit('changeAction', games[gameID].getActivePlayer().name);
+        });
      
         socket.on('disconnect', async () => {
                 console.log('Client disconnected:', socket.id);
