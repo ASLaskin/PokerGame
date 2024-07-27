@@ -30,6 +30,7 @@ const Game = () => {
     const [opponentChipStack, setOpponentChipStack] = useState(1000);
     const [gameState, setGameState] = useState('waiting');
     const [table, setTable] = useState([]);
+    const [currentAction, setCurrentAction] = useState('');
 
     useEffect(() => {
         const newSocket = io('http://localhost:3000');
@@ -37,6 +38,7 @@ const Game = () => {
         newSocket.emit('joinGame', gameID, name);
         newSocket.on('gameStart', (players) => {
             console.log('game started:', players);
+            setCurrentAction(players[0].name);
             for (let player of players) {
                 if (player.name !== name) {
                     setOpponent(player);
@@ -88,7 +90,11 @@ const Game = () => {
         <div className="game-board flex flex-col items-center justify-between h-screen bg-center bg-cover bg-no-repeat p-5 box-border text-white">
             <div className="flex flex-col items-center w-full">
                 <div className="flex space-x-4">
-                    <h3>Opponent: {opponent.name}</h3>
+                    {currentAction === name ? (
+                       <h3>Opponent: {opponent.name}</h3>
+                    ) : (
+                        <h3 className="bg-yellow-500">Opponent: {opponent.name}</h3>
+                    )}
                     <h3>Chip Stack: {opponentChipStack}</h3>
                 </div>
                 <div className="flex justify-center mt-2.5">
@@ -120,7 +126,11 @@ const Game = () => {
             )}
             <div className="flex flex-col items-center w-full">
                 <div className="flex space-x-4">
-                    <h3>Player: {name}</h3>
+                    {currentAction === name ? (
+                        <h3 className="bg-yellow-500">Player: {name}</h3>
+                    ) : (
+                        <h3>Player: {name}</h3>
+                    )}
                     <h3>Chip Stack: {chipStack} </h3>
                 </div>
                 <div className="flex justify-center mt-2.5">
