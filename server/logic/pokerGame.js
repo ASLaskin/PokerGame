@@ -326,6 +326,10 @@ class PokerGame {
     return this.table;
   }
 
+  getGameStage() {
+    return this.gameStage;
+  }
+  
   updateState(newState) {
     //we update it with mongo or maybe just get rid of it 
     this.gameState = { ...this.gameState, ...newState };

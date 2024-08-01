@@ -83,6 +83,10 @@ const handleSocket = (io) => {
 
         socket.on("changeAction", async (gameID) => {
             io.to(gameID).emit('changeAction', games[gameID].getActivePlayer().name);
+            if(games[gameID].getGameStage() == 0){
+                const hands = games[gameID].getHands();
+                io.to(gameID).emit('roundStart', Array.from(hands.entries()));
+            }
         });
      
         socket.on('disconnect', async () => {
