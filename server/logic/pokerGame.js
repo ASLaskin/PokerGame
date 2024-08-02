@@ -329,7 +329,14 @@ class PokerGame {
   getGameStage() {
     return this.gameStage;
   }
-  
+
+  getPlayerChips() {
+    let chips = new Map();
+    for(let player of this.players) {
+      chips.set(player.name, player.chips);
+    }
+    return chips;
+  }
   updateState(newState) {
     //we update it with mongo or maybe just get rid of it 
     this.gameState = { ...this.gameState, ...newState };

@@ -66,12 +66,12 @@ const handleSocket = (io) => {
                 games[gameID].handlePlayerAction("hi", 40, 'b');
             }
         });
-        
+
         socket.on('handleCall', async (gameID, name) => {
-            if(games[gameID].getActivePlayer().name == name) {
+            if (games[gameID].getActivePlayer().name == name) {
                 games[gameID].handlePlayerAction("hi", 0, 'c');
             }
-           
+
             io.to(gameID).emit('updateTable', games[gameID].getTableCards());
             console.log("Updating table with new cards", games[gameID].getTableCards());
         });
@@ -83,33 +83,35 @@ const handleSocket = (io) => {
 
         socket.on("changeAction", async (gameID) => {
             io.to(gameID).emit('changeAction', games[gameID].getActivePlayer().name);
-            if(games[gameID].getGameStage() == 0){
+            const chips = games[gameID].getPlayerChips();
+            io.to(gameID).emit('updateChips', Array.from(chips.entries()));
+            if (games[gameID].getGameStage() == 0) {
                 const hands = games[gameID].getHands();
                 io.to(gameID).emit('roundStart', Array.from(hands.entries()));
+            } 
+        });
+
+        socket.on('disconnect', async () => {
+            console.log('Client disconnected:', socket.id);
+            if (socket.gameID) {
+                try {
+                    const gameState = await GameState.findOne({ gameID: socket.gameID });
+                    if (gameState) {
+                        gameState.players -= 1;
+                        //change to properly handle player disconnect
+                        await gameState.save();
+
+                        //delete game if no players are left
+                        if (gameState.players.length === 0) {
+                            await GameState.deleteOne({ gameID: socket.gameID });
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error on disconnect:', error);
+                }
             }
         });
-     
-        socket.on('disconnect', async () => {
-                console.log('Client disconnected:', socket.id);
-                if (socket.gameID) {
-                    try {
-                        const gameState = await GameState.findOne({ gameID: socket.gameID });
-                        if (gameState) {
-                            gameState.players -= 1;
-                            //change to properly handle player disconnect
-                            await gameState.save();
+    });
+};
 
-                            //delete game if no players are left
-                            if (gameState.players.length === 0) {
-                                await GameState.deleteOne({ gameID: socket.gameID });
-                            }
-                        }
-                    } catch (error) {
-                        console.error('Error on disconnect:', error);
-                    }
-                }
-            });
-        });
-    };
-
-    module.exports = { handleSocket };
+module.exports = { handleSocket };

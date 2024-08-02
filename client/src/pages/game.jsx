@@ -58,6 +58,18 @@ const Game = () => {
                 }
             }
         });
+
+        newSocket.on('updateChips', (chipsArray) => {
+            const chips = new Map(chipsArray);
+            for (let [player, chipStack] of chips) {
+                if (player === name) {
+                    setChipStack(chipStack);
+                } else {
+                    setOpponentChipStack(chipStack);
+                }
+            }
+        });
+        
         newSocket.on("updateTable", (table) => {
           console.log("This ran")
           setTable(table);
