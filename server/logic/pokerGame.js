@@ -18,9 +18,9 @@ class PokerGame {
     let suits = 'HDCS';
     let values = '23456789TJQKA'
     let temp = ''
-    for(let j = 0; j < 13; j++) {
+    for (let j = 0; j < 13; j++) {
       temp = values[j];
-      for(let k = 0; k < 4; k++) {
+      for (let k = 0; k < 4; k++) {
         temp += suits[k];
         this.deck.push(temp)
         temp = values[j];
@@ -48,10 +48,10 @@ class PokerGame {
 
   shuffleCards() {
     let tempDeck = [];
-    for(let i = 0; i < 52; i++) {
+    for (let i = 0; i < 52; i++) {
       let j = Math.floor(Math.random() * this.deck.length);
       tempDeck.push(this.deck[j]);
-      this.deck.splice(j,1);
+      this.deck.splice(j, 1);
     }
     this.deck = tempDeck;
     this.di = 0;
@@ -63,14 +63,14 @@ class PokerGame {
   }
 
   dealCards() {
-    for(let player of this.players) {
+    for (let player of this.players) {
       player.hand = [this.getNewCard(), this.getNewCard()];
     }
   }
 
   getHands() {
     let hands = new Map();
-    for(let i = 0; i < this.players.length; i++) {
+    for (let i = 0; i < this.players.length; i++) {
       hands.set(this.players[i].name, this.players[i].hand);
     }
     console.log(hands);
@@ -82,12 +82,12 @@ class PokerGame {
     let big = small * 2;
 
     let i = this.dealer + 1;
-    if(i >= this.players.length) {
+    if (i >= this.players.length) {
       i = 0;
     }
     this.players[i].chips -= small;
     i++;
-    if(i >= this.players.length) {
+    if (i >= this.players.length) {
       i = 0;
     }
     this.players[i].chips -= big;
@@ -96,7 +96,7 @@ class PokerGame {
   }
 
   rotateDealer() {
-    if(this.dealer + 1 >= this.players.length) {
+    if (this.dealer + 1 >= this.players.length) {
       this.dealer = 0;
     } else {
       this.dealer++;
@@ -104,7 +104,7 @@ class PokerGame {
   }
 
   rotateActivePlayer() {
-    if(this.activePlayer + 1 >= this.players.length) {
+    if (this.activePlayer + 1 >= this.players.length) {
       this.activePlayer = 0;
     } else {
       this.activePlayer++;
@@ -112,7 +112,7 @@ class PokerGame {
   }
 
   nextBettingRound() {
-    for(let i = 0; i < this.bets.length; i++) {
+    for (let i = 0; i < this.bets.length; i++) {
       this.bets[i] = 0;
     }
     this.pot = 0;
@@ -123,8 +123,8 @@ class PokerGame {
     this.dealCards();
     this.collectBlinds();
     this.activePlayer = this.dealer + 3;
-    if(this.activePlayer >= this.players.length) {
-      this.activePlayer -= (this.players.length+1);
+    if (this.activePlayer >= this.players.length) {
+      this.activePlayer -= (this.players.length + 1);
     }
     console.log(this.activePlayer);
   }
@@ -141,7 +141,7 @@ class PokerGame {
   handleFold(player) {
     this.bets[this.activePlayer] = -1;
   }
-  
+
   handleCall(player) {
     let call = this.betToMatch - this.bets[this.activePlayer];
     this.bets[this.activePlayer] = this.betToMatch;
@@ -159,23 +159,43 @@ class PokerGame {
   }
 
   handleCheck(player) {
-    this.action = this.activePlayer;
+    if (this.betToMatch === 0) {
+      console.log(`${player.name} checks.`);
+      this.rotateActivePlayer();
+      if (this.actionPlayer === this.activePlayer) {
+        this.nextStage();
+      }
+    } else {
+      console.log(`${player.name} cannot check, they must call, raise, or fold.`);
+    }
   }
 
+  isRoundOver() {
+    for (let i = 0; i < this.players.length; i++) {
+      if (this.bets[i] === -1) continue;
+      if (this.bets[i] !== this.betToMatch) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+
   handlePlayerAction(player, amount, action) {
-    if(action == 'b') {
+    if (action == 'b') {
       this.handleBet(player, amount);
-    } else if(action == 'f') {
+    } else if (action == 'f') {
       this.handleFold(player);
-    } else if(action == 'c') {
+    } else if (action == 'c') {
       this.handleCall(player);
-    } else if(action == 'r') {
+    } else if (action == 'r') {
       this.handleRaise(player, amount);
-    } else if(action == 'ch') {
+    } else if (action == 'ch') {
       this.handleCheck(player);
     }
     this.rotateActivePlayer();
-    if(this.actionPlayer == this.activePlayer) {
+    if (this.actionPlayer == this.activePlayer) {
       this.nextStage();
     }
   }
@@ -188,7 +208,7 @@ class PokerGame {
     this.table.push(this.getNewCard());
     this.table.push(this.getNewCard());
     this.activePlayer = this.dealer + 1;
-    if(this.activePlayer >= this.players.length) {
+    if (this.activePlayer >= this.players.length) {
       this.activePlayer = 0;
     }
     this.actionPlayer = this.activePlayer;
@@ -200,7 +220,7 @@ class PokerGame {
     this.betToMatch = 0;
     this.table.push(this.getNewCard());
     this.activePlayer = this.dealer + 1;
-    if(this.activePlayer >= this.players.length) {
+    if (this.activePlayer >= this.players.length) {
       this.activePlayer = 0;
     }
     this.actionPlayer = this.activePlayer;
@@ -212,24 +232,24 @@ class PokerGame {
     this.betToMatch = 0;
     this.table.push(this.getNewCard());
     this.activePlayer = this.dealer + 1;
-    if(this.activePlayer >= this.players.length) {
+    if (this.activePlayer >= this.players.length) {
       this.activePlayer = 0;
     }
     this.actionPlayer = this.activePlayer;
   }
 
   nextStage() {
-    if(this.gameStage == 0) {
+    if (this.gameStage == 0) {
       this.handleFlop();
-    } else if(this.gameStage == 1) {
+    } else if (this.gameStage == 1) {
       this.handleTurn();
-    } else if(this.gameStage == 2) {
+    } else if (this.gameStage == 2) {
       this.handleRiver();
-    } else if(this.gameStage == 3) {
+    } else if (this.gameStage == 3) {
       this.distributePot();
       this.nextBettingRound();
     }
-    for(let i = 0; i < this.bets.length; i++) {
+    for (let i = 0; i < this.bets.length; i++) {
       this.bets[i] = 0;
     }
     this.gameStage++;
@@ -243,8 +263,8 @@ class PokerGame {
   determineWinner() {
     let hands = [];
     let indicies = [];
-    for(let i = 0; i < this.players.length; i++) {
-      if(this.bets[i] > 0) {
+    for (let i = 0; i < this.players.length; i++) {
+      if (this.bets[i] > 0) {
         hands.push(this.players[i].hand);
         indicies.push(i);
       }
@@ -253,35 +273,35 @@ class PokerGame {
     let wi = 0;
     let draw = false;
     let drawPlayers = [];
-    for(let i = 0; i < hands.length; i++) {
+    for (let i = 0; i < hands.length; i++) {
       let temp = this.table;
       temp = temp.concat(hands[i]);
       let val = PokerEvaluator.evalHand(temp).value
       console.log(temp);
       console.log(val);
-      if(val > winner) {
+      if (val > winner) {
         draw = true;
         winner = val;
         wi = indicies[i];
         drawPlayers = [this.players[wi]];
-      } else if(val == winner) {
+      } else if (val == winner) {
         draw = true;
         drawPlayers.push(this.players[indicies[i]]);
       }
     }
 
-    if(draw) {
+    if (draw) {
       return drawPlayers;
-    } 
+    }
     return [this.players[wi]];
   }
 
   distributePot() {
     let winners = this.determineWinner();
     let payout = this.pot;
-    if(winners.length > 1) {
+    if (winners.length > 1) {
       payout /= winners.length;
-      for(let i = 0; i < winners.length; i++) {
+      for (let i = 0; i < winners.length; i++) {
         winners[i].chips += payout;
       }
     } else {
@@ -332,11 +352,15 @@ class PokerGame {
 
   getPlayerChips() {
     let chips = new Map();
-    for(let player of this.players) {
+    for (let player of this.players) {
       chips.set(player.name, player.chips);
     }
     return chips;
   }
+  getCurrentBet() {
+    return this.bets[this.activePlayer];
+  }
+
   updateState(newState) {
     //we update it with mongo or maybe just get rid of it 
     this.gameState = { ...this.gameState, ...newState };

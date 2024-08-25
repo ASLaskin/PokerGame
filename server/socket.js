@@ -62,7 +62,7 @@ const handleSocket = (io) => {
         });
 
         socket.on('handleBet', async (gameID, name) => {
-            if(games[gameID].getActivePlayer().name == name) {
+            if (games[gameID].getActivePlayer().name == name) {
                 games[gameID].handlePlayerAction("hi", 40, 'b');
             }
         });
@@ -77,8 +77,31 @@ const handleSocket = (io) => {
         });
 
         socket.on('handleCheck', async (gameID, name) => {
-            console.log(games[gameID].getActivePlayer().name);
-            console.log(games[gameID].getActionPlayer().name);
+            try {
+                const game = games[gameID];
+
+                if (game.getActivePlayer().name === name) {
+                    if (game.getCurrentBet() === 0) {
+                        game.handlePlayerAction(name, 0, 'k');  
+                        console.log(`${name} checked.`);
+
+                        io.to(gameID).emit('changeAction', game.getActivePlayer().name);
+                        io.to(gameID).emit('updateChips', Array.from(game.getPlayerChips().entries()));
+
+                        if (game.isRoundOver()) {
+                            io.to(gameID).emit('updateTable', games[gameID].getTableCards());
+                            io.to(gameID).emit('changeAction', game.getActivePlayer().name);
+                        }
+                    } else {
+                        socket.emit('error', { message: 'You cant check theres a bet' });
+                    }
+                } else {
+                    socket.emit('error', { message: 'It aint your turn.' });
+                }
+            } catch (error) {
+                console.error('Error handling check', error);
+                socket.emit('error', { message: 'error while  check' });
+            }
         });
 
         socket.on("changeAction", async (gameID) => {
@@ -88,7 +111,7 @@ const handleSocket = (io) => {
             if (games[gameID].getGameStage() == 0) {
                 const hands = games[gameID].getHands();
                 io.to(gameID).emit('roundStart', Array.from(hands.entries()));
-            } 
+            }
         });
 
         socket.on('disconnect', async () => {
